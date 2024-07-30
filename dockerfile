@@ -1,5 +1,5 @@
 # Use an official MuleSoft image as a parent image
-FROM mulesoft/mule-runtime:4.3.0
+FROM Mulesoft/mule-runtime:4.3.0
 
 # Set the working directory in the container
 WORKDIR /opt/mule
