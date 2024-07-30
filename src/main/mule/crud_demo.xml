@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4993353b-0626-436d-aec4-52191bf9ae73" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="ce531800-7946-47a7-9407-a1c5618909fe" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="mule_db" />
+	</db:config>
+	<flow name="crud_demoFlow" doc:id="77e0af3c-9564-48f9-a3fe-74d2c6bec02a" >
+		<http:listener doc:name="Listener" doc:id="08caf04f-032c-4658-adfd-e3bfd4cafa33" config-ref="HTTP_Listener_config" path="/projects" allowedMethods="GET"/>
+		<db:select doc:id="dcdacd9c-74a9-43fc-9e0c-09fb9d262fbf" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select *  from project;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="c38bb4ce-2c0e-4846-9552-56b9c9ac08c1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="crud_demoFlow1_getById" doc:id="f9b26572-62ab-4c6b-8df2-e0c05da548b8" >
+		<http:listener doc:name="Listener" doc:id="9b30bbb0-a3e3-464c-bc50-27b9a6f5eef1" config-ref="HTTP_Listener_config" allowedMethods="GET" path="/projects/{id}"/>
+		<db:select doc:name="Select" doc:id="da6799c1-b010-4c1a-87e1-300d748f1538" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * from project where Id = :id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: attributes.uriParams.id
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="41800763-2a52-4922-8b95-31ddb7f4fa63" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="crud_demoFlow1_post" doc:id="762d3d78-9596-4acf-a142-0ebfdd6786fe" >
+		<http:listener doc:name="Listener" doc:id="9732150c-c9b3-4808-9535-5bf9b2ab4d12" config-ref="HTTP_Listener_config" path="/projects"/>
+		<db:insert doc:name="Insert" doc:id="57fa6698-73d0-4757-9bb5-ec49fba393e4" config-ref="Database_Config">
+			<db:sql ><![CDATA[Insert into project (Id, name) values (:id, :name);]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id:payload.id,
+	name: payload.name
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="2147cced-dbe2-4ddd-bc59-a986b1bd4704" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="crud_demoFlow1_patch" doc:id="89ea2000-86d7-4df0-a34f-8cce70aa95b1" >
+		<http:listener doc:name="Listener" doc:id="92ffa9b0-fca5-4c71-909b-1b594a665df0" config-ref="HTTP_Listener_config" path="/projects" allowedMethods="PATCH"/>
+		<db:update doc:name="Update" doc:id="9214d2de-aabd-4cd8-83d3-50ef6b30336c" config-ref="Database_Config">
+			<db:sql ><![CDATA[Update project set name = :name where Id=:id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: payload.id,
+	name: payload.name
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="f334a48d-63c9-4aab-aada-121579ad9e31" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="crud_demoFlow1_deleteById" doc:id="49835f30-e458-4136-9833-1609ed3bb1a9" >
+		<http:listener doc:name="Listener" doc:id="a84b4500-db5e-4cb7-84b9-91b34b31dece" config-ref="HTTP_Listener_config" path="/projects/{id}" allowedMethods="DELETE"/>
+		<db:delete doc:name="Delete" doc:id="3772545d-a44c-46a4-94ac-0da4fb0c05bc" config-ref="Database_Config">
+			<db:sql ><![CDATA[Delete from project where Id=:id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: attributes.uriParams.id
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="e29a732f-f0ef-45bd-92a6-f634c4950e90" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="crud_demoFlow1" doc:id="8663ba74-44eb-40a6-8151-69f115b62238" >
+		<http:listener doc:name="Listener" doc:id="f039babf-ba73-40de-9eea-5161faeead8b" config-ref="HTTP_Listener_config" path="/projects" allowedMethods="PUT"/>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="aee38453-76f5-4865-93ab-16ea5fd63bb0" variableName="vInput"/>
+		<db:select doc:name="Select" doc:id="8a70e48c-ffb8-4b68-a76a-b0eaeccb3c83" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select Id from project where Id=:id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id: vars.vInput.id
+}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="b7f9921e-b418-4d30-ae11-59894e06dda5" >
+			<when expression="#[payload.id != null]">
+				<db:update doc:name="Update" doc:id="0a2a1144-13e7-4c6e-962b-d79edcd0b780" config-ref="Database_Config">
+					<db:sql ><![CDATA[update project set name=:name where Id=:id;]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	id:vars.vInput.id,
+	name:vars.vInput.name
+}]]]></db:input-parameters>
+				</db:update>
+			</when>
+			<otherwise >
+				<db:insert doc:name="Insert" doc:id="951fdb65-8ef7-4a27-8e8a-fce912c62d29" config-ref="Database_Config">
+					<db:sql ><![CDATA[Insert into project (Id,name) values(:id,:name)]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	id:vars.vInput.id,
+	name:vars.vInput.name
+}]]]></db:input-parameters>
+				</db:insert>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="c3df4f54-a2fe-46e7-bac8-d1dce6c7835a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
