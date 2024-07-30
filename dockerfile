@@ -1,31 +1,25 @@
-# Use OpenJDK 17 as the base image
-FROM openjdk:17-jdk
+# Use an official base image with apt-get support
+FROM openjdk:17-jdk-slim AS build
 
-LABEL maintainer="bibekgorain"
-
-ENV MULE_HOME=/opt/mule
-ENV MULE_VERSION=4.4.0
-
-# Install unzip
+# Install required tools
 RUN apt-get update && \
     apt-get install -y unzip curl && \
     rm -rf /var/lib/apt/lists/*
 
+# Set working directory
+WORKDIR /opt/mule
+
 # Download and install Mule runtime
-RUN set -x \
-    && cd /opt \
-    && curl -o mule.zip https://repository-master.mulesoft.org/nexus/content/repositories/releases/org/mule/distributions/mule-standalone/${MULE_VERSION}/mule-standalone-${MULE_VERSION}.zip \
-    && unzip mule.zip \
-    && mv mule-standalone-$MULE_VERSION mule \
-    && rm mule.zip
+RUN curl -L -o mule-runtime.zip "https://s3.amazonaws.com/mule-artifacts/releases/4.4.0/mule-runtime-4.4.0.zip" && \
+    unzip mule-runtime.zip && \
+    rm mule-runtime.zip
 
-WORKDIR $MULE_HOME
+# Copy the Mule application and configuration files to the container
+COPY ./target/your-mule-app.jar /opt/mule/apps/your-mule-app.jar
 
-# Define volumes for logs, configuration, apps, and domains
-VOLUME ["$MULE_HOME/logs", "$MULE_HOME/conf", "$MULE_HOME/apps", "$MULE_HOME/domains"]
+# Expose any ports that your Mule application uses
+EXPOSE 8081 8082
 
-# Expose the default Mule HTTP port
-EXPOSE 8081
-
-# Set the entry point for the container
-ENTRYPOINT ["./bin/mule"]
+# Define the entrypoint command to start Mule
+ENTRYPOINT ["/opt/mule/bin/mule"]
+CMD ["-M", "start"]
