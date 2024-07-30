@@ -1,14 +1,18 @@
-# Use an official MuleSoft image as a parent image
-FROM mulesoft/mule-runtime:4.3.0
+# Use the official Mule runtime base image
+FROM mulesoft/mule-runtime:4.4.0
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /opt/mule
 
-# Copy the Mule application to the container
-COPY target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
+# Copy the Mule application and configuration files to the container
+COPY ./target/your-mule-app.jar /opt/mule/apps/your-mule-app.jar
 
-# Expose the port your application runs on
-EXPOSE 8081
+# Copy any additional configuration files if necessary
+# COPY ./path/to/config /opt/mule/conf
 
-# Run the Mule application
-CMD ["mule"]
+# Expose any ports that your Mule application uses
+EXPOSE 8081 8082
+
+# Define the entrypoint command to start Mule
+ENTRYPOINT ["mule"]
+CMD ["-M", "start"]
