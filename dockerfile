@@ -1,10 +1,15 @@
-# Use an OpenJDK 8 image as a parent image
-FROM adoptopenjdk/openjdk8
+# Use OpenJDK 17 as the base image
+FROM openjdk:17-jdk
 
 LABEL maintainer="bibekgorain"
 
 ENV MULE_HOME=/opt/mule
 ENV MULE_VERSION=4.4.0
+
+# Install unzip
+RUN apt-get update && \
+    apt-get install -y unzip curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Download and install Mule runtime
 RUN set -x \
