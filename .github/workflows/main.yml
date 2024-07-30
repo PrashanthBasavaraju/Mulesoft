@@ -44,7 +44,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        tags: prashanthbasavaraju1411/Mulesoft:latest
+        tags: prashanthbasavaraju1411/mulesoft:latest
 
     # - name: Deploy to MuleSoft CloudHub
     #   env:
