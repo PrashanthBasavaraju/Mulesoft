@@ -1,14 +1,18 @@
-# Use an official Mule runtime base image with an accessible version
-FROM mulesoft/flex-gateway
+# Stage 1: Build the application
+FROM maven:3.8.4-openjdk-17-slim AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package
+RUN ls -l /app/target
+
+# Stage 2: Set up Mule Runtime and application
+FROM mulesoft/flex-gateway:latest
 
 # Set the working directory inside the container
 WORKDIR /opt/mule
 
-# Download and install Mule runtime if needed
-# RUN curl -L -o mule-runtime.zip "URL" && unzip mule-runtime.zip && rm mule-runtime.zip
-
-# Copy the Mule application JAR file to the container
-COPY target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
+# Copy the Mule application JAR file from the build stage to the Mule runtime
+COPY --from=build /app/target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
 
 # Expose any ports that your Mule application uses
 EXPOSE 8081 8082
