@@ -31,7 +31,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t prashanthbasavaraju1411/your-mule-app:latest .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/mule_crud:latest .
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -41,4 +41,4 @@ jobs:
 
     - name: Push Docker image
       run: |
-        docker push prashanthbasavaraju1411/your-mule-app:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/mule_crud:latest
