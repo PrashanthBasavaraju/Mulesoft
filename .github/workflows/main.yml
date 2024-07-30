@@ -1,36 +1,39 @@
-name: CI/CD
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
-  workflow_dispatch:
+      - main  # or the branch you want to trigger builds from
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Build with Maven
-        run: mvn clean install
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
 
-      - name: Build Docker image
-        run: docker build -t bg-mule-se:4.4.0 .
+    - name: Build Docker image
+      run: |
+        docker build -t prashanthbasavaraju1411/your-mule-app:latest .
 
-      - name: Run Docker container
-        run: docker run -d --name bg-mule-se-440 -p "8081:8081" bg-mule-se:4.4.0
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Copy Mule application JAR to Docker container
-        run: docker cp target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar bg-mule-se-440:/opt/mule/apps
+    - name: Push Docker image
+      run: |
+        docker push prashanthbasavaraju1411/your-mule-app:latest
