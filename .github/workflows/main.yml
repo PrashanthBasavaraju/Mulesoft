@@ -1,12 +1,14 @@
-name: CI/CD Pipeline
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
-      - master
+      - master  
+
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,42 +16,29 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Java
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'
-
-    - name: Install Maven dependencies
-      run: mvn install -DskipTests
-
-    - name: Run tests
-      run: mvn test
-
-    - name: Package application
-      run: mvn package
+      uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      uses: docker/setup-buildx-action@v2
 
-    - name: Login to DockerHub
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build Docker image
+      run: |
+        docker build -t prashanthbasavaraju1411/your-mule-app:latest .
+
+    - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        tags: prashanthbasavaraju1411/mulesoft:latest
-
-    # - name: Deploy to MuleSoft CloudHub
-    #   env:
-    #     MULESOFT_USERNAME: ${{ secrets.MULESOFT_USERNAME }}
-    #     MULESOFT_PASSWORD: ${{ secrets.MULESOFT_PASSWORD }}
-    #   run: |
-    #      Replace with your deployment command for MuleSoft
-    #     echo "Deploying to MuleSoft CloudHub..."
+    - name: Push Docker image
+      run: |
+        docker push prashanthbasavaraju1411/your-mule-app:latest
