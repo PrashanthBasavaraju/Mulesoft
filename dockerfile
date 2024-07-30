@@ -15,7 +15,7 @@ RUN curl -L -o mule-runtime.zip "https://s3.amazonaws.com/mule-artifacts/release
     rm mule-runtime.zip
 
 # Copy the Mule application JAR file to the container
-COPY ./target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
+COPY target/crud_demo-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
 
 # Expose any ports that your Mule application uses
 EXPOSE 8081 8082
