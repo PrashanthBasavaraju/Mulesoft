@@ -3,11 +3,11 @@ name: VM Connector Build and Push Docker Image
 on:
   push:
     branches:
-      - feat/vm-connector  
+      - feat/vm_connector  
 
   pull_request:
     branches:
-      - feat/vm-connector
+      - feat/vm_connector
   workflow_dispatch:
 
 jobs:
