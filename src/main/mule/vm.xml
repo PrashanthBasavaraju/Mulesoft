@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="119a14ca-b420-49e1-9147-47a531f29309" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="60bc8385-c6e1-4b68-aafc-3bb7b171ac19" >
+		<vm:queues >
+			<vm:queue queueName="Queue1" queueType="PERSISTENT" />
+			<vm:queue queueName="Queue2" queueType="PERSISTENT" />
+			<vm:queue queueName="Queue3" />
+		</vm:queues>
+	</vm:config>
+	<flow name="vmFlow" doc:id="a0d7c636-1b2a-4b61-aca4-79f5ee81398d" >
+		<http:listener doc:name="Listener" doc:id="7c1a5504-3402-49bf-b8ce-e402589e31e1" config-ref="HTTP_Listener_config" path="/vm-publish"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fc198e18-70e4-4e2e-8bad-0f64ada4b238" message="#[payload]"/>
+		<vm:publish queueName="Queue1" doc:name="Publish" doc:id="174c3a90-e5cb-4606-87d1-b12bed36ee47" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="63dee813-6ea2-4088-9ce4-7aa021f80ad6" message='#["hello logger"]'/>
+	</flow>
+</mule>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="consumeFlow" doc:id="82f50250-cf87-4dbb-8f3e-f8b33c7eede6" >
+		<http:listener doc:name="Listener" doc:id="ebb833b5-01b8-46fa-9f80-18dabd29c568" config-ref="HTTP_Listener_config" path="/consume"/>
+		<vm:publish doc:name="Publish" doc:id="4b2036e9-7960-4494-a93f-7ac43a9fa571" config-ref="VM_Config" queueName="Queue3"/>
+		<flow-ref doc:name="Flow Reference" doc:id="79eecee9-afd4-42e0-a585-6f5cf83a1c30" name="consumeFlow1"/>
+	</flow>
+	<flow name="consumeFlow1" doc:id="3688560e-1b84-4d60-b9be-fe26ab7847f9" >
+		<ee:transform doc:name="Transform Message" doc:id="7be56861-ae80-4d41-97c7-fa227353a94e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{"user":1} wait 10000]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="41a5629e-d448-4e69-9e6c-efd92e4dafb0" message='#["Hiii"]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="2d9a260a-364a-4419-8072-046f8f53c180" message='#["Hello"]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="526441f3-d199-4621-82d3-a341a23e03a7" message='#["Before consume"]'/>
+		<vm:consume queueName="Queue3" doc:name="Consume" doc:id="bb2323b8-1541-4473-90c9-c5a17dfc544d" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2873e3b3-72c8-4764-b063-a658bc9adc8d" message="#[payload]"/>
+	</flow>
+</mule>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="publish-consumeFlow" doc:id="cd5fb83a-8fb7-4d92-a586-157ca4fa8a5b" >
+		<http:listener doc:name="Listener" doc:id="bcea30d1-22b9-40b8-bbaf-9e955644b6e0" config-ref="HTTP_Listener_config" path="/publish-consume"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b7fca2b6-6416-4964-b290-3aa5e0fa58a9" message="#[payload]"/>
+		<vm:publish-consume queueName="Queue2" doc:name="Publish consume" doc:id="e23f4d26-f265-418b-925c-c0668c3f0360" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1f1651d7-51b5-45f0-8ce4-e1342bcf39ce" message='#[payload]'/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="34a16d22-7d26-41bd-b89e-468cc1a0f3a2" type="VM:QUEUE_TIMEOUT">
+				<set-payload value='#["Queue Timeout"]' doc:name="Set Payload" doc:id="452a8467-4659-4b48-b3e3-22cab893d041" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="publish-consumeFlow1" doc:id="711a05b0-e15c-4056-aa1e-2284c55e0244" >
+		<vm:listener queueName="Queue2" doc:name="Listener" doc:id="99f4811e-1561-44e5-a641-c09cd7af891c" config-ref="VM_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="148de434-0b17-4d57-ae90-95ac2de97eb4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::Runtime
+output application/json
+---
+{"user":1} wait 10000 ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6bd8c624-0e87-47ea-8706-37e279726099" message="#[payload]"/>
+		<set-payload value='#["Hello Listener"]' doc:name="Set Payload" doc:id="3f20b620-dc2c-4e85-b944-398b75d09478" />
+	</flow>
+</mule>

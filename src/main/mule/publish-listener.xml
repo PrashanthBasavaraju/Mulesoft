@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<flow name="publish-listenerFlow" doc:id="f5163fe8-cb11-46c0-9916-9fcb16d7a947" >
+		<http:listener doc:name="Listener" doc:id="2b8c67f6-52fe-4a44-a95c-773e5ab77aab" config-ref="HTTP_Listener_config" path="/publish-listener"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4b7c46c2-e8d1-4c88-b577-8b981cb4d4aa" message="#[payload]"/>
+		<set-variable value="1" doc:name="Set Variable" doc:id="65c491a5-2c81-4db6-af86-136ee8dc9d2f" variableName="counter"/>
+		<vm:publish queueName="Queue1" doc:name="Publish" doc:id="02763002-1f57-4a15-98a2-22d2aeeee81a" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3b0e6bda-6d49-4409-b7dc-ced1d1fa679f" message='#["end of publish"]'/>
+	</flow>
+	<flow name="publish-listenerFlow1" doc:id="3fbdcc0d-4d1d-4918-b11e-a9b13bb150f5" >
+		<vm:listener queueName="Queue1" doc:name="Listener" doc:id="3e9a02d6-5829-44af-bd69-444982b611fa" config-ref="VM_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8c408a0a-7b90-4baa-987d-8dc0d42462c2" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f8a6283c-5c7e-4e05-ac29-6f756d6b03c8" message='#[vars.counter]'/>
+	</flow>
+</mule>
