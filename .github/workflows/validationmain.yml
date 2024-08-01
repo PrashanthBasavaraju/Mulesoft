@@ -1,4 +1,4 @@
-name: VM Connector Build and Push Docker Image
+name: Validations Build and Push Docker Image
 
 on:
   push:
