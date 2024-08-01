@@ -96,7 +96,7 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="crud_demoFlow1" doc:id="8663ba74-44eb-40a6-8151-69f115b62238" >
+	<flow name="crud_demoFlow1_put" doc:id="8663ba74-44eb-40a6-8151-69f115b62238" >
 		<http:listener doc:name="Listener" doc:id="f039babf-ba73-40de-9eea-5161faeead8b" config-ref="HTTP_Listener_config" path="/projects" allowedMethods="PUT"/>
 		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="aee38453-76f5-4865-93ab-16ea5fd63bb0" variableName="vInput"/>
 		<db:select doc:name="Select" doc:id="8a70e48c-ffb8-4b68-a76a-b0eaeccb3c83" config-ref="Database_Config">
