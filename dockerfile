@@ -13,7 +13,6 @@ WORKDIR /opt/mule
 
 # Copy the Mule application JAR file from the build stage to the Mule runtime
 COPY --from=build /vm/target/vm-1.0.0-SNAPSHOT-mule-application.jar /opt/mule/apps/crud_demo.jar
-/vm/target/vm-1.0.0-SNAPSHOT-mule-application.jar
 # Expose any ports that your Mule application uses
 EXPOSE 8081 8082
 
