@@ -3,11 +3,11 @@ name: VM Connector Build and Push Docker Image
 on:
   push:
     branches:
-      - feat/vm-connector  
+      - feat/vm_connector  
 
   pull_request:
     branches:
-      - feat/vm-connector
+      - feat/vm_connector
   workflow_dispatch:
 
 jobs:
@@ -41,4 +41,4 @@ jobs:
 
     - name: Push Docker image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/mule_crud:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/vmconnector:latest
